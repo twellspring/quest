@@ -56,8 +56,8 @@ resource "aws_ecs_task_definition" "quest" {
       },
       "environment": [
       {
-        "name": "DUMMY",
-        "value": "Sensational"
+        "name": "SECRET_WORD",
+        "value": "${var.secret_word}"
       }
     ]
     }
@@ -70,11 +70,19 @@ resource "aws_ecs_service" "quest" {
   cluster         = "${aws_ecs_cluster.quest.id}"
   task_definition = "${aws_ecs_task_definition.quest.arn}"
   launch_type     = "FARGATE"
-  desired_count   = 1
+  desired_count   = 2
 
   network_configuration {
-    subnets = module.vpc.public_subnets
+    subnets = module.vpc.private_subnets
     assign_public_ip = true
-    security_groups = [aws_security_group.quest.id]
+    security_groups = [aws_security_group.ecs.id]
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.quest.arn
+    container_name   = "${var.prefix}_quest"
+    container_port   = 3000
+  }
+
+  depends_on = [aws_lb.quest]
 }

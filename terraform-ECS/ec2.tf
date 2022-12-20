@@ -1,25 +1,69 @@
 
-resource "aws_security_group" "quest" {
-  name        = "${var.prefix}_ingress"
-  description = "Allow inbound traffic"
+resource "aws_security_group" "ecs" {
+  name        = "${var.prefix}_ecs"
+  description = "ECS security group"
   vpc_id      = module.vpc.vpc_id
+
+    lifecycle {
+      create_before_destroy = true
+  }
 }
 
 
-resource "aws_security_group_rule" "http_ingress" {
-  security_group_id = aws_security_group.quest.id
+resource "aws_security_group_rule" "ecs_ingress" {
+  security_group_id = aws_security_group.ecs.id
   type              = "ingress"
-  from_port         = 3000
-  to_port           = 3000
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]  
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = [var.vpc_cidr]
 }
 
-resource "aws_security_group_rule" "egress" {
-  security_group_id = aws_security_group.quest.id
+resource "aws_security_group_rule" "ecs_egress" {
+  security_group_id = aws_security_group.ecs.id
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]  
+}
+
+
+resource "aws_security_group" "alb" {
+  name        = "${var.prefix}_alb"
+  description = "ALB Security Group"
+  vpc_id      = module.vpc.vpc_id
+
+    lifecycle {
+      create_before_destroy = true
+  }
+}
+
+
+resource "aws_security_group_rule" "alb_http_ingress" {
+  security_group_id = aws_security_group.alb.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]  
+}
+
+
+resource "aws_security_group_rule" "alb_https_ingress" {
+  security_group_id = aws_security_group.alb.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]  
+}
+
+resource "aws_security_group_rule" "alb_egress" {
+  security_group_id = aws_security_group.alb.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = [var.vpc_cidr]
 }
