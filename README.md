@@ -22,11 +22,11 @@ I then deployed it via terraform to ECS (Manual creation of resources followed b
 - DNS entry, manually created on my hosting provider
 - TLS Certs, downloaded from my hosting provider
 
-While troubleshooting a vague ECS error in  my deployment I realized the image I had uploaded was ARM instead of x86. I chose to update the Makefile to create an X86 image. 
+While troubleshooting a vague ECS error in  my deployment I realized the image I had uploaded was ARM instead of x86. I chose to update the Makefile to create an X86 image. After this was "fixed" I also ran into the following error on the root URL.
 
 ![Error]( images/quest-error.png "Error")
 
-I used the URL on the error page to access the Secret word. 
+I chose to move forward instead of another troubleshooting session and used the URL on the error page to access the Secret word. 
 
 ![Yoda]( images/quest-yoda.png "Yoda")
 
